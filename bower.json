@@ -1,18 +1,19 @@
 {
   "name": "locals-contractlistener",
-  "version": "1.0.7",
+  "version": "0.0.1",
   "authors": [
-    "Anonymous <anonymous@example.com>"
+    "Anonymous <stefaan@ponnet.com>"
   ],
-  "description": "An element providing a solution to no problem in particular.",
+  "description": "A Polymer component to listen to blockchain events ( contracts / addresses ) and emit polymer events.",
   "keywords": [
-    "web-component",
+    "web-components",
     "polymer",
-    "seed"
+    "ethereum",
+    "web3"
   ],
   "main": "locals-contractlistener.html",
   "license": "http://polymer.github.io/LICENSE.txt",
-  "homepage": "https://github.com/<USERNAME>/seed-element/",
+  "homepage": "https://github.com/locals-world/locals-contractlistener",
   "ignore": [
     "/.*",
     "/test/"
