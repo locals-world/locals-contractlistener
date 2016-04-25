@@ -1,0 +1,113 @@
+<!--
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../polymer/polymer.html">
+
+<!--
+An element wrapping listen and exposes polymer events
+Example:
+
+    <locals-contractlistener web3="{{web3}}" filter="{{filterobject}}" on-filter-match="callback"></locals-contractlistener>
+
+You need to provide a web3-wallet component to this component. See an example on how to do this in the demo.
+This component uses web3.js - so you will need access to an Ethereum node before you can start running queries.
+
+@demo demo/index.html
+-->
+
+<dom-module id="locals-contractlistener">
+  <script>
+    Polymer({
+      is: 'locals-contractlistener',
+
+      properties: {
+        /**
+         * the `web3-wallet` instance to use.
+         */
+        web3: {
+          type: Object,
+          notify:true,
+          observer: '_filterobserver'
+        },
+        /**
+        * The `filter` object can be either a string or an object.
+        * refer to https://github.com/ethereum/wiki/wiki/JavaScript-API#web3ethfilter for information
+        * on how to create a filter. 
+        **/        
+        filter: {
+          type: Object,
+          value: 'latest',
+          observer: '_filterobserver'
+        },
+        /**
+        * the 'nowatch' attribute tells the filter to perform a get instead of a watch
+        * Can be used for queries on the blockchain instead of listening
+        */
+        nowatch: {
+          type: Boolean,
+          value: false
+        }
+      },
+
+      // Element Lifecycle
+
+      ready: function() {
+        // attached to web3JS ?
+        this.attached = false;
+      },
+
+      attached: function() {
+        // `attached` fires once the element and its parents have been inserted
+        // into a document.
+        //
+        // This is a good place to perform any work related to your element's
+        // visual state or active behavior (measuring sizes, beginning animations,
+        // loading resources, etc).
+        
+      },
+
+      detached: function() {
+        // The analog to `attached`, `detached` fires when the element has been
+        // removed from a document.
+        //
+        // Use this to clean up anything you did in `attached`.
+        if (this.filter){
+          this.filter.stopWatching();
+        }
+      },
+
+      _filterobserver: function() {
+        var self = this;
+        if (!this.attached && this.web3 && this.filter) {
+          this.attached = true;
+          this.filter = this.web3.eth.filter(this.filter);
+          if (this.nowatch) {
+            this.filter.get(function(error, result) {
+              self.fire('filter-match', {
+                error: error,
+                result: result
+              });
+            });
+          } else {
+            this.filter.watch(function(error, result) {
+              self.fire('filter-match', {
+                error: error,
+                result: result
+              });
+            });
+          }
+        } else {
+          console.log('component not ready yet');
+        }
+
+      }
+    });
+  </script>
+</dom-module>
