@@ -1,0 +1,97 @@
+<!doctype html>
+<!--
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+    <title>locals-style Demo</title>
+    <script src="../../webcomponentsjs/webcomponents-lite.min.js"></script>
+    <link rel="import" href="../locals-style.html">
+    <style>
+      .democanvas {
+        color: #333333;
+        width: 90vw;
+        margin: 5vw;
+      }
+      .color {
+        color: white;
+        box-sizing: border-box;
+        padding: 30px;
+      }
+      .blacktxt {
+        color: #333333;
+      }
+      .whitespace {
+        height: 20px;
+      }
+
+    </style>
+
+  </head>
+  <body>
+
+    <!--     <locals-style></locals-style> -->
+
+  <div class="democanvas">
+  <div class="localstypo">
+    <h1>This is a Locals h1 title.</h1>
+    <h2>This is a Locals h2 title.</h2>
+    <h3>This is a Locals h3 title.</h3>
+    <h4>This is a Locals h4 title.</h4>
+
+    <div class="whitespace"></div>
+
+    <p>This is a Locals p-tag. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer neque erat, sollicitudin et purus ut, dignissim tincidunt nisl. Nam non venenatis nibh. Aenean tincidunt, purus iaculis placerat feugiat, purus erat pharetra nisl, sed consequat magna turpis a elit. In auctor tincidunt ornare. Ut feugiat arcu nec neque faucibus, sed fringilla metus tempus. Nullam ut cursus tellus, eget mollis nisl. Nulla ac gravida nunc. Donec sed massa varius, feugiat nisl vitae, pulvinar metus.</p>
+
+
+    <div class="whitespace"></div>
+    <div class="whitespace"></div>
+    <div class="whitespace"></div>
+
+    <div class="color greenback">
+      <h2>var(--locals-green)</h2>
+      <p>Use the var to use this color or use class '.greenback' to use this color in the background.</p>
+    </div>
+
+    <div class="color redback">
+      <h2>var(--locals-red)</h2>
+      <p>Use the var to use this color or use class '.redback' to use this color in the background.</p>
+    </div>
+
+
+    <div class="color yellowback">
+      <h2>var(--locals-yellow)</h2>
+      <p>Use the var to use this color or use class '.yellowback' to use this color in the background.</p>
+    </div>
+
+    <div class="color darkblueback">
+      <h2>var(--locals-darkblue)</h2>
+      <p>Use the var to use this color or use class '.darkblueback' to use this color in the background.</p>   
+    </div>
+
+    <div class="color blueback">
+      <h2>var(--locals-blue)</h2>
+      <p>Use the var to use this color or use class '.blueback' to use this color in the background.</p>     
+    </div>
+
+    <div class="color lightblueback">
+      <h2>var(--locals-lightblue)</h2>
+      <p>Use the var to use this color or use class '.lightblueback' to use this color in the background.</p>
+    </div>
+
+    <div class="color blacktxt greyback">
+      <h2>var(--locals-grey)</h2>
+      <p>Use the var to use this color or use class '.greyback' to use this color in the background.</p> 
+    </div>
+  </div>
+  </div>
+  </body>
+</html>

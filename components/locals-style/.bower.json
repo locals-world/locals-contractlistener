@@ -1,0 +1,34 @@
+{
+  "name": "locals-style",
+  "authors": [
+    "Anonymous <anonymous@example.com>"
+  ],
+  "description": "An element providing a solution to no problem in particular.",
+  "keywords": [
+    "web-component",
+    "polymer",
+    "seed"
+  ],
+  "main": "locals-style.html",
+  "license": "http://polymer.github.io/LICENSE.txt",
+  "homepage": "https://github.com/<USERNAME>/seed-element/",
+  "ignore": [
+    "/.*",
+    "/test/"
+  ],
+  "dependencies": {
+    "polymer": "Polymer/polymer#^1.2.0"
+  },
+  "devDependencies": {
+    "iron-component-page": "PolymerElements/iron-component-page#^1.0.0"
+  },
+  "_release": "8c63e8e27c",
+  "_resolution": {
+    "type": "branch",
+    "branch": "master",
+    "commit": "8c63e8e27c6ca9d3d6fd731dc7e88ec206aeda5c"
+  },
+  "_source": "https://github.com/locals-world/locals-elements-style.git",
+  "_target": "*",
+  "_originalSource": "https://github.com/locals-world/locals-elements-style.git"
+}

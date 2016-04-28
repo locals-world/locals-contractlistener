@@ -1,0 +1,195 @@
+<!--
+@license
+Copyright (c) 2016 A-labs. All rights reserved.
+/////////////////
+LOCALS
+/////////////////
+-->
+
+<link rel="import" href="../polymer/polymer.html">
+
+<style is="custom-style">
+
+
+    @font-face {
+      font-family: Opensanslight;
+      src: url(locals-fonts/OpenSans-Light.ttf);
+    }
+
+    @font-face {
+      font-family: Opensans;
+      src: url(locals-fonts/OpenSans-Regular.ttf);
+    }
+
+    @font-face {
+      font-family: Opensanssemibold;
+      src: url(locals-fonts/OpenSans-Semibold.ttf);
+    }
+
+    @font-face {
+      font-family: Opensansbold;
+      src: url(locals-fonts/OpenSans-Bold.ttf);
+    }
+
+
+
+  :root {
+    --opensans-light: {
+      font-family: Opensanslight;
+      -webkit-font-smoothing: antialiased;
+      font-weight: 100;
+    };
+
+    --opensans-reg: {
+      font-family: Opensans;
+      -webkit-font-smoothing: antialiased;
+      font-weight: 300;
+    };
+
+    --opensans-semibold: {
+      font-family: Opensanssemibold;
+      -webkit-font-smoothing: antialiased;
+      font-weight: 700;
+    };
+
+    --opensans-bold: {
+      font-family: Opensansbold;
+      -webkit-font-smoothing: antialiased;
+      font-weight: 900;
+    };
+
+    --locals-font-nowrap: {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    };
+
+
+    --locals-font-h1: {
+      @apply(--opensans-light);
+      @apply(--locals-font-nowrap);
+      -webkit-margin-before:7px;
+      -webkit-margin-after:7px;
+      -webkit-margin-start:0em;
+      -webkit-margin-end:0em;
+      margin: 7px 0px 7px 0px;
+      padding: 0px;
+      font-size: 40px;
+      line-height: 52px;
+    };
+
+    --locals-font-h2: {
+      @apply(--opensans-reg);
+      @apply(--locals-font-nowrap);
+      -webkit-margin-before:7px;
+      -webkit-margin-after:7px;
+      -webkit-margin-start:0em;
+      -webkit-margin-end:0em;      
+      margin: 7px 0px 7px 0px;
+      padding: 0px;
+      font-size: 30px;
+      line-height: 34px;
+    };
+
+    --locals-font-h3: {
+      @apply(--opensans-semibold);
+      @apply(--locals-font-nowrap);
+      -webkit-margin-before:10px;
+      -webkit-margin-after:10px;
+      -webkit-margin-start:0em;
+      -webkit-margin-end:0em;
+      margin: 10px 0px 10px 0px;
+      padding: 0px;
+      font-size: 24px;
+      line-height: 26px;
+    };
+
+    --locals-font-h4: {
+      @apply(--opensans-bold);
+      @apply(--locals-font-nowrap);
+      -webkit-margin-before:10px;
+      -webkit-margin-after:10px;
+      -webkit-margin-start:0em;
+      -webkit-margin-end:0em;
+      margin: 10px 0px 10px 0px;
+      padding: 0px;
+      font-size: 20px;
+      line-height: 22px;
+    };
+
+
+
+    --locals-font-body1: {
+      @apply(--opensans-light);
+      font-size: 18px;
+      font-weight: 300;
+      line-height: 24px;
+      -webkit-margin-before:0px;
+      -webkit-margin-after:0px;
+      -webkit-margin-start:0em;
+      -webkit-margin-end:0em;
+      margin: 0px;
+    };
+
+    --locals-font-small: {
+      @apply(--opensans-bold);
+      font-size: 10px;
+      font-weight: 300;
+      line-height: 12px;
+      -webkit-margin-before:0px;
+      -webkit-margin-after:0px;
+      -webkit-margin-start:0em;
+      -webkit-margin-end:0em;
+      margin: 0px;
+    };
+
+
+
+    --locals-font-menu: {
+      @apply(--opensans-light);
+      @apply(--locals-font-nowrap);
+      font-size: 13px;
+      font-weight: 500;
+      line-height: 24px;
+    };
+
+    --locals-font-button: {
+      @apply(--opensans-light);
+      @apply(--locals-font-nowrap);
+    };
+    
+/*    --locals-typo: {
+      @apply(--locals-font-h1);
+      @apply(--locals-font-h2);
+      @apply(--locals-font-h3);
+      @apply(--locals-font-h4);
+      @apply(--locals-font-p);
+    };*/
+
+  }
+
+  .localstypo h1 {
+    @apply(--locals-font-h1);
+  }
+  .localstypo h2 {
+    @apply(--locals-font-h2);
+  }
+  .localstypo h3 {
+    @apply(--locals-font-h3);
+  }
+  .localstypo h4 {
+    @apply(--locals-font-h4);
+  }
+  .localstypo p {
+    @apply(--locals-font-body1);
+  }
+
+/*  .localstypo {
+    @apply(--locals-font-h1);
+    @apply(--locals-font-h2);
+    @apply(--locals-font-h3);
+    @apply(--locals-font-h4);
+    @apply(--locals-font-body1);
+  }*/
+
+</style>

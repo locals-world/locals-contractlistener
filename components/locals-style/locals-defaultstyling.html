@@ -1,0 +1,36 @@
+<!--
+@license
+Copyright (c) 2016 A-labs. All rights reserved.
+/////////////////
+LOCALS
+/////////////////
+-->
+
+<link rel="import" href="../polymer/polymer.html">
+
+<style is="custom-style">
+
+  :root {
+
+
+  --locals-canvas: {
+    width: 100vw;
+    box-sizing: border-box;
+    padding: 5vh 5vw 5vh 5vw;
+    };
+  }
+
+  .localscanvas {
+    @apply(--locals-canvas);
+  }
+
+  .whitespace {
+    height: 20px;
+  }
+  
+  .localswrapper {
+    width: 100%;
+    @apply(--layout-horizontal);
+    @apply(--layout-wrap);
+  }
+</style>

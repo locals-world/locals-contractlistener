@@ -1,0 +1,64 @@
+<!--
+@license
+Copyright (c) 2016 A-labs. All rights reserved.
+/////////////////
+LOCALS
+/////////////////
+-->
+<link rel="import" href="../polymer/polymer.html">
+
+<link rel="import" href="locals-color.html">
+<link rel="import" href="locals-typography.html">
+<link rel="import" href="locals-defaultstyling.html">
+
+<!--
+
+The `<locals-style>` component provides simple ways to use the Locals look and feel
+in your component/application. The following seperate imports are available:
+
+1. [locals-color.html](https://github.com/locals-world/locals-elements-style/blob/master/locals-color.html):
+a complete list of the colors used in Locals
+
+2. [locals-typography.html](https://github.com/locals-world/locals-elements-style/blob/master/locals-typography.html):
+All of the classes and mixins used to style the typography of Locals
+
+Including the complete `<locals-style>` will include these two files at once.
+
+
+
+@demo demo/index.html
+@hero hero.svg
+-->
+
+<dom-module id="locals-style">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+
+    </style>
+
+    <content></content>
+
+  </template>
+
+  <script>
+    Polymer({
+      is: 'locals-style',
+
+      properties: {
+
+      },
+      ready: function() {
+      
+      },
+
+      attached: function() {
+      
+      }
+
+
+    });
+  </script>
+</dom-module>

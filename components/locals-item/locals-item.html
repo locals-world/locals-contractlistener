@@ -1,0 +1,90 @@
+<!--
+@license
+Copyright (c) 2016 A-labs. All rights reserved.
+/////////////////
+LOCALS
+/////////////////
+-->
+
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../locals-style/locals-style.html">
+<!--
+Using a Locals item
+
+    <locals-item> item </locals-item>
+@demo demo/index.html
+@hero hero.svg
+-->
+
+<dom-module id="locals-item">
+  <template>
+    <style>
+      :host {
+        display: block;
+        position: relative;
+        box-sizing: border-box;
+        padding: 5px 0px 5px 0px;
+        @apply(--opensans-light);
+      }
+
+
+      :host(.iron-selected) {
+       @apply(--opensans-semibold);     
+      }
+
+      :host([hidden]) {
+        display: none !important;
+      }
+
+      :host([disabled]) {
+        opacity: 0.5;
+        cursor: auto;
+        pointer-events: none;
+      }
+
+
+    </style>
+
+    <content></content>
+
+  </template>
+
+  <script>
+    Polymer({
+      is: 'locals-item',
+
+      properties: {
+       
+      },
+
+      // Element Lifecycle
+
+      ready: function() {
+        // `ready` is called after all elements have been configured, but
+        // propagates bottom-up. This element's children are ready, but parents
+        // are not.
+        //
+        // This is the point where you should make modifications to the DOM (when
+        // necessary), or kick off any processes the element wants to perform.
+      },
+
+      attached: function() {
+        // `attached` fires once the element and its parents have been inserted
+        // into a document.
+        //
+        // This is a good place to perform any work related to your element's
+        // visual state or active behavior (measuring sizes, beginning animations,
+        // loading resources, etc).
+      },
+
+      detached: function() {
+        // The analog to `attached`, `detached` fires when the element has been
+        // removed from a document.
+        //
+        // Use this to clean up anything you did in `attached`.
+      }
+
+
+    });
+  </script>
+</dom-module>
