@@ -12,9 +12,20 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
 <!--
 An element wrapping listen and exposes polymer events
-Example:
+Simple example:
 
-    <locals-contractlistener web3="{{web3}}" filter="{{filterobject}}" on-filter-match="callback"></locals-contractlistener>
+    <locals-contractlistener
+      web3="{{web3}}" filter="{{filterobject}}"
+      on-filter-match="callback">
+    </locals-contractlistener>
+
+listener with time limit:
+
+    <locals-contractlistener
+      web3="{{web3}}" filter="{{filterobject}}"
+      on-filter-match="callback"
+      timeout="60">
+    </locals-contractlistener>
 
 You need to provide a web3-wallet component to this component. See an example on how to do this in the demo.
 This component uses web3.js - so you will need access to an Ethereum node before you can start running queries.
@@ -34,7 +45,7 @@ This component uses web3.js - so you will need access to an Ethereum node before
         web3: {
           type: Object,
           notify:true,
-          observer: '_filterobserver'
+          observer: '_web3observer'
         },
         /**
         * The `filter` object can be either a string or an object.
@@ -53,6 +64,19 @@ This component uses web3.js - so you will need access to an Ethereum node before
         nowatch: {
           type: Boolean,
           value: false
+        },
+        /**
+        * the timeout attribute is optional. It defines a maximum TTL in seconds before the filter gets cleaned up
+        * ommiting this parameter makes the listener listen forever.
+        */
+        timeout: {
+          type: Number,
+          observer: '_timeoutobserver'
+        },
+
+        filterattached: {
+          type: Boolean,
+          notify: true
         }
       },
 
@@ -60,7 +84,7 @@ This component uses web3.js - so you will need access to an Ethereum node before
 
       ready: function() {
         // attached to web3JS ?
-        this.attached = false;
+        this.filterattached = false;
       },
 
       attached: function() {
@@ -78,16 +102,40 @@ This component uses web3.js - so you will need access to an Ethereum node before
         // removed from a document.
         //
         // Use this to clean up anything you did in `attached`.
-        if (this.filter){
+      },
+
+      _destroyfilter: function() {
+        if (this.filter && !this.nowatch) {
           this.filter.stopWatching();
+          delete this.filter;
+        }
+      },
+
+      _web3observer: function(){
+        if (!this.filterattached){
+          this._filterobserver();
+        }
+      },
+
+      _timeoutobserver: function() {
+        var self = this;
+        if (this.timeout) {
+          setTimeout(function() {
+            self._destroyfilter();
+            self.fire('timeout');
+          }, this.timeout * 1000);
         }
       },
 
       _filterobserver: function() {
         var self = this;
-        if (!this.attached && this.web3 && this.filter) {
-          this.attached = true;
+        if (this.filterattached){
+          this._destroyfilter();
+        }
+        if (!this.filterattached && this.web3 && this.filter) {
+          this.filterattached = true;
           this.filter = this.web3.eth.filter(this.filter);
+
           if (this.nowatch) {
             this.filter.get(function(error, result) {
               self.fire('filter-match', {
@@ -103,10 +151,7 @@ This component uses web3.js - so you will need access to an Ethereum node before
               });
             });
           }
-        } else {
-          console.log('component not ready yet');
-        }
-
+        } 
       }
     });
   </script>

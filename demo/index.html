@@ -18,6 +18,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   <link rel="import" href="../../web3-wallet/web3-wallet.html"></head>
   <link rel="import" href="../../locals-style/locals-style.html"></head>
   <link rel="import" href="../../locals-item/locals-item.html"></head>
+  <link rel="import" href="../../paper-input/paper-input.html"></head>
+  <link rel="import" href="../../paper-button/paper-button.html"></head>
 <body unresolved>
 
   <template is="dom-bind" id="app">
@@ -25,37 +27,69 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <web3-wallet id="web3wallet" password="test" web3="{{web3}}" host="{{host}}" account={{account}} keystore="{{keystore}}" balance="{{balance}}"></web3-wallet>
 
     <div class="localscanvas">
-    <div class="localstypo">
-    <h1>Listener with no filter</h1>
-    <p>Defaults to 'latest' - returns last block hash</p>
-    <locals-contractlistener web3="{{web3}}" on-filter-match="eventhandler1"></locals-contractlistener>
-    <ul>
-      <template is="dom-repeat" items="{{events1}}">
-        <locals-item>{{item.error}} - {{item.result}}</locals-item>
-      </template>
-    </ul>
+      <div class="localstypo">
 
-    <h1>Listener with filter='pending'</h1>
-    <p>returns last transaction hashes</p>
-    <locals-contractlistener filter="pending" web3="{{web3}}" on-filter-match="eventhandler2"></locals-contractlistener>
-    <ul>
-      <template is="dom-repeat" items="{{events2}}">
-        <locals-item>{{item.error}} - {{item.result}}</locals-item>
-      </template>
-    </ul>
+        <h1>Listener added in code</h1>
+        <template is="dom-if" if="{{!dynamiclistener1eventsactive}}">
+          <paper-button raised on-tap="makeelement">Add Listener</paper-button>
+        </template>
+        <div id="dynamiclistener1"></div>
+        <template is="dom-if" if="{{dynamiclistener1eventsactive}}">
+          <h2>Events of out dynamic event</h2>
+          <ul>
+            <template is="dom-repeat" items="{{dynamiclistener1events}}">
+              <locals-item>{{item.error}} - {{item.result}}</locals-item>
+            </template>
+          </ul>
+        </template>
 
-    <h1>Listener with filter=object</h1>
-    <p>Object<pre>{{filterobject}}</pre></p>
-    <locals-contractlistener filter="{{filter3}}" web3="{{web3}}" on-filter-match="eventhandler3"></locals-contractlistener>
-    <ul>
-      <template is="dom-repeat" items="{{events3}}">
-        <locals-item>{{item.error}} - {{item.result.transactionHash}}</locals-item>
-      </template>
-    </ul>
+        <h1>Listener with no filter</h1>
+        <p>Defaults to 'latest' - returns last block hash</p>
+        <locals-contractlistener web3="{{web3}}" on-filter-match="eventhandler1"></locals-contractlistener>
+        <ul>
+          <template is="dom-repeat" items="{{events1}}">
+            <locals-item>{{item.error}} - {{item.result}}</locals-item>
+          </template>
+        </ul>
 
+        <h1>Listener with filter='pending'</h1>
+        <p>returns last transaction hashes</p>
+        <locals-contractlistener filter="pending" web3="{{web3}}" on-filter-match="eventhandler2"></locals-contractlistener>
+        <ul>
+          <template is="dom-repeat" items="{{events2}}">
+            <locals-item>{{item.error}} - {{item.result}}</locals-item>
+          </template>
+        </ul>
 
-  </div>
-  </div>
+        <h1>Listener with contract address</h1>
+        <paper-input value="{{contractaddressinput}}" label="Enter contract/account address"></paper-input>
+        <paper-button raised on-tap="setcontractaddress">Start Listening</paper-button>
+        <div is="dom-if" if="{{contractaddress}}">
+          <p>
+            returns last transaction hashes on contract {{contractaddress}}
+          </p>
+          <locals-contractlistener filter="{{filter4}}" web3="{{web3}}" on-filter-match="eventhandler4"></locals-contractlistener>
+          <ul>
+            <template is="dom-repeat" items="{{events4}}">
+              <locals-item>{{item.error}} - {{item.result}}</locals-item>
+            </template>
+          </ul>
+        </div>
+
+        <h1>Listener with filter=object</h1>
+        <p>
+          Object
+          <pre>{{filterobject}}</pre>
+        </p>
+        <locals-contractlistener filter="{{filter3}}" web3="{{web3}}" on-filter-match="eventhandler3"></locals-contractlistener>
+        <ul>
+          <template is="dom-repeat" items="{{events3}}">
+            <locals-item>{{item.error}} - {{item.result.transactionHash}}</locals-item>
+          </template>
+        </ul>
+
+      </div>
+    </div>
 
   </template>
 
@@ -65,14 +99,39 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       'use strict';
       var app = document.querySelector('#app');
       app.host = "http://109.123.70.141:8545";
+
+      //listener button
+      app.dynamiclistener1eventsactive = false;
+      app.makeelement = function(){
+
+        // listener 1
+        app.dynamiclistener1events = [];
+        app.dynamiclistener1eventhandler = function(a){
+          app.push('dynamiclistener1events',a.detail);
+        };
+
+        // create new filter element
+        var myfilter = document.createElement('locals-contractlistener');
+        myfilter.web3 = this.$.web3wallet.web3;
+        myfilter.timeout = 15;
+        myfilter.addEventListener('filter-match',app.dynamiclistener1eventhandler);       
+
+        app.dynamiclistener1eventsactive = true;
+        myfilter.addEventListener('timeout',function(){
+          app.dynamiclistener1eventsactive = false;
+        });
+
+      }
+
+      // listener 1
       app.events1 = [];
       app.eventhandler1 = function(a,b){
         app.push('events1',b);
       };
 
       app.events2 = [];
-      app.eventhandler2 = function(a,b){
-        app.push('events2',b);
+      app.eventhandler2 = function(a, b) {
+        app.push('events2', b);
       };
 
       app.filter3 = {
@@ -86,6 +145,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       app.events3 = [];
       app.eventhandler3 = function(a,b){
         app.push('events3',b);
+      };
+
+
+      app.events4 = [];
+      app.setcontractaddress = function(){
+        app.events4 = [];
+        app.filter4 = {
+          address: app.contractaddressinput
+        };
+      };
+
+      app.eventhandler4 = function(a,b){
+        app.push('events4',b);
       };
 
     })(document);
