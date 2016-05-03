@@ -105,9 +105,9 @@ This component uses web3.js - so you will need access to an Ethereum node before
       },
 
       _destroyfilter: function() {
-        if (this.filter && !this.nowatch) {
-          this.filter.stopWatching();
-          delete this.filter;
+        if (this.filterInstance && !this.nowatch) {
+          this.filterInstance.stopWatching();
+          delete this.filterInstance;
         }
       },
 
@@ -134,17 +134,17 @@ This component uses web3.js - so you will need access to an Ethereum node before
         }
         if (!this.filterattached && this.web3 && this.filter) {
           this.filterattached = true;
-          this.filter = this.web3.eth.filter(this.filter);
+          this.filterInstance = this.web3.eth.filter(this.filter);
 
           if (this.nowatch) {
-            this.filter.get(function(error, result) {
+            this.filterInstance.get(function(error, result) {
               self.fire('filter-match', {
                 error: error,
                 result: result
               });
             });
           } else {
-            this.filter.watch(function(error, result) {
+            this.filterInstance.watch(function(error, result) {
               self.fire('filter-match', {
                 error: error,
                 result: result
