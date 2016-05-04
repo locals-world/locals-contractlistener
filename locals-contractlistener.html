@@ -10,6 +10,8 @@ LOCALS
 <link rel="import" href="../locals-style/locals-style.html">
 <link rel="import" href="../locals-loader/locals-loader.html">
 
+<link rel="import" href="../iron-flex-layout/iron-flex-layout.html">
+
 <!--
 An element listening to the state of transaction hashes
 Simple example:
@@ -36,13 +38,57 @@ This component uses web3.js - so you will need access to an Ethereum node before
         display: block;
       }
 
+      h1 {
+        @apply(--locals-font-h1);
+      }
+
+      h3 {
+        @apply(--locals-font-h3);
+      }      
+
+      p {
+        @apply(--locals-font-body1);
+      }
+
+      .bold {
+        @apply(--opensans-reg);
+      }
+
+      .blue {
+        color:var(--locals-blue);
+      }
+
+      .msg {
+        width: 100%
+        @apply(--layout-horizontal);
+        @apply(--layout-center);
+      }
+
+      locals-icon {
+        margin-left: 8px;
+      }
+
+
   </style>
+
+  <h1>{{action}}</h1>
+
   <template is="dom-if" if="{{_isstate(state,'init')}}">
-    <locals-loader small>The tx is started</locals-loader>
+    <locals-loader small>Initialising</locals-loader>
   </template>
-  <template is="dom-if" if="{{_isstate(state,'txstarted')}}">tx gestart</template>
-  <template is="dom-if" if="{{_isstate(state,'txexpired')}}">tx expired</template>
-  <template is="dom-if" if="{{_isstate(state,'txmined')}}">tx gemined</template>
+  <template is="dom-if" if="{{_isstate(state,'txstarted')}}">
+    <div class="msg"><p>Received transaction hash </p><locals-icon small icon="v" iconcolor="darkgrey"></locals-icon></div>
+    <locals-loader small>Mining transaction hash</locals-loader>
+  </template>
+  <template is="dom-if" if="{{_isstate(state,'txexpired')}}">
+    <p>tx expired !!!</p>
+<!--     <locals-loader small>tx expired</locals-loader> -->
+  </template>
+  <template is="dom-if" if="{{_isstate(state,'txmined')}}">
+  <div class="msg"><p>Initialised, received transaction hash </p><locals-icon small icon="v" iconcolor="darkgrey"></locals-icon></div>
+  <div class="msg"><p>Transaction hash mined </p><locals-icon small icon="v" iconcolor="darkgrey"></locals-icon></div>
+  <h3>{{succes}}</h3>
+  </template>
 </template>
 <script>
     Polymer({
@@ -74,6 +120,16 @@ This component uses web3.js - so you will need access to an Ethereum node before
         _filterattached: {
           type: Boolean,
           notify: true
+        },
+
+        action: {
+          type: String,
+          value: ''
+        },
+
+        succes: {
+          type: String,
+          value: 'Done!'
         }
       },
 
