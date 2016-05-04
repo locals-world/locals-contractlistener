@@ -29,64 +29,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <div class="localscanvas">
       <div class="localstypo">
 
-        <h1>Listener added in code</h1>
-        <template is="dom-if" if="{{!dynamiclistener1eventsactive}}">
-          <paper-button raised on-tap="makeelement">Add Listener</paper-button>
-        </template>
-        <div id="dynamiclistener1"></div>
-        <template is="dom-if" if="{{dynamiclistener1eventsactive}}">
-          <h2>Events of out dynamic event</h2>
-          <ul>
-            <template is="dom-repeat" items="{{dynamiclistener1events}}">
-              <locals-item>{{item.error}} - {{item.result}}</locals-item>
-            </template>
-          </ul>
-        </template>
+        <h1>States</h1>
+        <h2>init</h2>
+        <locals-contractlistener state="init" web3="{{web3}}"></locals-contractlistener>
+        <h2>txstarted</h2>
+        <locals-contractlistener state="txstarted" web3="{{web3}}"></locals-contractlistener>
+        <h2>txexpired</h2>
+        <locals-contractlistener state="txexpired" web3="{{web3}}"></locals-contractlistener>
+        <h2>txmined</h2>
+        <locals-contractlistener state="txmined" web3="{{web3}}"></locals-contractlistener>
 
-        <h1>Listener with no filter</h1>
-        <p>Defaults to 'latest' - returns last block hash</p>
-        <locals-contractlistener web3="{{web3}}" on-filter-match="eventhandler1"></locals-contractlistener>
-        <ul>
-          <template is="dom-repeat" items="{{events1}}">
-            <locals-item>{{item.error}} - {{item.result}}</locals-item>
-          </template>
-        </ul>
 
-        <h1>Listener with filter='pending'</h1>
-        <p>returns last transaction hashes</p>
-        <locals-contractlistener filter="pending" web3="{{web3}}" on-filter-match="eventhandler2"></locals-contractlistener>
-        <ul>
-          <template is="dom-repeat" items="{{events2}}">
-            <locals-item>{{item.error}} - {{item.result}}</locals-item>
-          </template>
-        </ul>
-
-        <h1>Listener with contract address</h1>
-        <paper-input value="{{contractaddressinput}}" label="Enter contract/account address"></paper-input>
-        <paper-button raised on-tap="setcontractaddress">Start Listening</paper-button>
-        <div is="dom-if" if="{{contractaddress}}">
-          <p>
-            returns last transaction hashes on contract {{contractaddress}}
-          </p>
-          <locals-contractlistener filter="{{filter4}}" web3="{{web3}}" on-filter-match="eventhandler4"></locals-contractlistener>
-          <ul>
-            <template is="dom-repeat" items="{{events4}}">
-              <locals-item>{{item.error}} - {{item.result}}</locals-item>
-            </template>
-          </ul>
-        </div>
-
-        <h1>Listener with filter=object</h1>
-        <p>
-          Object
-          <pre>{{filterobject}}</pre>
-        </p>
-        <locals-contractlistener filter="{{filter3}}" web3="{{web3}}" on-filter-match="eventhandler3"></locals-contractlistener>
-        <ul>
-          <template is="dom-repeat" items="{{events3}}">
-            <locals-item>{{item.error}} - {{item.result.transactionHash}}</locals-item>
-          </template>
-        </ul>
 
       </div>
     </div>
