@@ -9,6 +9,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 -->
 
 <link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../locals-style/locals-style.html">
+<link rel="import" href="../locals-loader/locals-loader.html">
 
 <!--
 An element listening to the state of transaction hashes
@@ -30,7 +32,9 @@ This component uses web3.js - so you will need access to an Ethereum node before
 -->
 <dom-module id="locals-contractlistener">
 <template>
-  <template is="dom-if" if="{{_isstate(state,'init')}}">Initial state</template>
+  <template is="dom-if" if="{{_isstate(state,'init')}}">
+    <locals-loader>The tx is started</locals-loader>
+  </template>
   <template is="dom-if" if="{{_isstate(state,'txstarted')}}">tx gestart</template>
   <template is="dom-if" if="{{_isstate(state,'txexpired')}}">tx expired</template>
   <template is="dom-if" if="{{_isstate(state,'txmined')}}">tx gemined</template>

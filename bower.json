@@ -24,7 +24,8 @@
     "locals-style": "https://github.com/locals-world/locals-style.git",
     "locals-item": "https://github.com/locals-world/locals-item.git",
     "paper-input": "^1.1.11",
-    "paper-button": "^1.0.11"
+    "paper-button": "^1.0.11",
+    "locals-loader": "https://github.com/locals-world/locals-loader.git"
   },
   "devDependencies": {
     "iron-component-page": "PolymerElements/iron-component-page#^1.0.0"
