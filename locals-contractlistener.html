@@ -11,16 +11,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../polymer/polymer.html">
 
 <!--
-An element wrapping listen and exposes polymer events
+An element listening to the state of transaction hashes
 Simple example:
 
     <locals-contractlistener
-      web3="{{web3}}" filter="{{filterobject}}"
-      on-filter-match="callback"></locals-contractlistener>
+      web3="{{web3}}"
+      txhash="{{transactionhash}}">
+    </locals-contractlistener>
 listener with time limit:
 <locals-contractlistener
-      web3="{{web3}}" filter="{{filterobject}}"
-      on-filter-match="callback"
+      web3="{{web3}}"
+      txhash="{{transactionhash}}
       timeout="60"></locals-contractlistener>
 You need to provide a web3-wallet component to this component. See an example on how to do this in the demo.
 This component uses web3.js - so you will need access to an Ethereum node before you can start running queries.
@@ -29,10 +30,9 @@ This component uses web3.js - so you will need access to an Ethereum node before
 -->
 <dom-module id="locals-contractlistener">
 <template>
-  <template is="dom-if" if="{{isv(state,'init')}}">Initial state</template>
-  <template is="dom-if" if="{{isv(state,'txstarted')}}">tx gestart</template>
-  <template is="dom-if" if="{{isv(state,'txhashreceived')}}">tx hash ontvangen</template>
-  <template is="dom-if" if="{{isv(state,'txmined')}}">tx gemined</template>
+  <template is="dom-if" if="{{_isstate(state,'init')}}">Initial state</template>
+  <template is="dom-if" if="{{_isstate(state,'txstarted')}}">tx gestart</template>
+  <template is="dom-if" if="{{_isstate(state,'txmined')}}">tx gemined</template>
 </template>
 <script>
     Polymer({
@@ -44,30 +44,21 @@ This component uses web3.js - so you will need access to an Ethereum node before
          */
         web3: {
           type: Object,
-          notify:true,
           observer: '_web3observer'
         },
+        /*
+        * the current state the component is in
+        */
         state: {
           type: String,
           value: 'init'
         },
         /**
-        * The `filter` object can be either a string or an object.
-        * refer to https://github.com/ethereum/wiki/wiki/JavaScript-API#web3ethfilter for information
-        * on how to create a filter. 
+        * The transactionhash to listen to object can be either a string or an object.
         **/        
-        filter: {
-          type: Object,
-          value: 'latest',
-          observer: '_filterobserver'
-        },
-        /**
-        * the 'nowatch' attribute tells the filter to perform a get instead of a watch
-        * Can be used for queries on the blockchain instead of listening
-        */
-        nowatch: {
-          type: Boolean,
-          value: false
+        txhash: {
+          type: String,
+          observer: '_txhashobserver'
         },
         /**
         * the timeout attribute is optional. It defines a maximum TTL in seconds before the filter gets cleaned up
@@ -79,7 +70,7 @@ This component uses web3.js - so you will need access to an Ethereum node before
           observer: '_timeoutobserver'
         },
 
-        filterattached: {
+        _filterattached: {
           type: Boolean,
           notify: true
         }
@@ -89,10 +80,10 @@ This component uses web3.js - so you will need access to an Ethereum node before
 
       ready: function() {
         // attached to web3JS ?
-        this.filterattached = false;
+        this._filterattached = false;
       },
 
-      isv: function(variable,value) {
+      _isstate: function(variable,value) {
         return (variable == value);
       },
 
@@ -124,8 +115,8 @@ This component uses web3.js - so you will need access to an Ethereum node before
       },
 
       _web3observer: function(){
-        if (!this.filterattached){
-          this._filterobserver();
+        if (!this._filterattached){
+          this._txhashobserver();
         }
       },
 
@@ -140,31 +131,27 @@ This component uses web3.js - so you will need access to an Ethereum node before
         }
       },
 
-      _filterobserver: function() {
+      _txhashobserver: function() {
         var self = this;
-        if (this.filterattached){
+        if (this._filterattached) {
           this._destroyfilter();
         }
-        if (!this.filterattached && this.web3 && this.filter) {
-          this.filterattached = true;
-          this.filterInstance = this.web3.eth.filter(this.filter);
+        if (!this._filterattached && this.web3 && this.txhash) {
+          this.state = 'txstarted'
+          this._filterattached = true;
+          this.filterInstance = this.web3.eth.filter({
+            topics: [this.txhash]
+          });
 
-          if (this.nowatch) {
-            this.filterInstance.get(function(error, result) {
-              self.fire('filter-match', {
-                error: error,
-                result: result
-              });
+          this.filterInstance.get(function(error, result) {
+            self.state = 'txmined'
+
+            self.fire('filter-match', {
+              error: error,
+              result: result
             });
-          } else {
-            this.filterInstance.watch(function(error, result) {
-              self.fire('filter-match', {
-                error: error,
-                result: result
-              });
-            });
-          }
-        } 
+          });
+        }
       }
     });
   </script>
