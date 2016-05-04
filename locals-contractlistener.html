@@ -32,6 +32,7 @@ This component uses web3.js - so you will need access to an Ethereum node before
 <template>
   <template is="dom-if" if="{{_isstate(state,'init')}}">Initial state</template>
   <template is="dom-if" if="{{_isstate(state,'txstarted')}}">tx gestart</template>
+  <template is="dom-if" if="{{_isstate(state,'txexpired')}}">tx expired</template>
   <template is="dom-if" if="{{_isstate(state,'txmined')}}">tx gemined</template>
 </template>
 <script>
@@ -47,24 +48,24 @@ This component uses web3.js - so you will need access to an Ethereum node before
           observer: '_web3observer'
         },
         /*
-        * the current state the component is in
-        */
+         * the current state the component is in
+         */
         state: {
           type: String,
           value: 'init'
         },
         /**
-        * The transactionhash to listen to object can be either a string or an object.
-        **/        
+         * The transactionhash to listen to object can be either a string or an object.
+         **/
         txhash: {
           type: String,
           observer: '_txhashobserver'
         },
         /**
-        * the timeout attribute is optional. It defines a maximum TTL in seconds before the filter gets cleaned up
-        * ommiting this parameter makes the listener listen forever.
-        * When a timeout occurs - this element fires a 'timeout' event
-        */
+         * the timeout attribute is optional. It defines a maximum TTL in seconds before the filter gets cleaned up
+         * ommiting this parameter makes the listener listen forever.
+         * When a timeout occurs - this element fires a 'timeout' event
+         */
         timeout: {
           type: Number,
           observer: '_timeoutobserver'
@@ -83,7 +84,7 @@ This component uses web3.js - so you will need access to an Ethereum node before
         this._filterattached = false;
       },
 
-      _isstate: function(variable,value) {
+      _isstate: function(variable, value) {
         return (variable == value);
       },
 
@@ -94,6 +95,7 @@ This component uses web3.js - so you will need access to an Ethereum node before
         // This is a good place to perform any work related to your element's
         // visual state or active behavior (measuring sizes, beginning animations,
         // loading resources, etc).
+        this._txhashobserver();
       },
 
       detached: function() {
@@ -108,14 +110,14 @@ This component uses web3.js - so you will need access to an Ethereum node before
           this.filterInstance.stopWatching();
           delete this.filterInstance;
         }
-        if (this.timoutInstance){
+        if (this.timoutInstance) {
           clearTimeout(this.timoutInstance);
           delete this.timoutInstance;
         }
       },
 
-      _web3observer: function(){
-        if (!this._filterattached){
+      _web3observer: function() {
+        if (!this._filterattached) {
           this._txhashobserver();
         }
       },
@@ -138,20 +140,38 @@ This component uses web3.js - so you will need access to an Ethereum node before
         }
         if (!this._filterattached && this.web3 && this.txhash) {
           this.state = 'txstarted'
-          this._filterattached = true;
-          this.filterInstance = this.web3.eth.filter({
-            topics: [this.txhash]
-          });
 
-          this.filterInstance.get(function(error, result) {
-            self.state = 'txmined'
 
-            self.fire('filter-match', {
-              error: error,
-              result: result
-            });
+          /*
+           * Watch for a particular transaction hash and call the awaiting function when done;
+           * Ether-pudding uses another method, with web3.eth.getTransaction(...) and checking the txHash;
+           * on https://github.com/ConsenSys/ether-pudding/blob/master/index.js
+           */
+          var blockCounter = 15;
+          // Wait for tx to be finished
+          var filter = this.web3.eth.filter('latest').watch(function(err, blockHash) {
+            if (blockCounter <= 0) {
+              filter.stopWatching();
+              filter = null;
+
+              self.state = 'expired';
+              return;
+            }
+            // Get info about latest Ethereum block
+            var block = self.web3.eth.getBlock(blockHash);
+            --blockCounter;
+            // Found tx hash?
+            if (block.transactions.indexOf(self.txhash) > -1) {
+              // Tx is finished
+              filter.stopWatching();
+              filter = null;
+              self.state = 'txmined';
+              // Tx hash not found yet?
+            } else {
+              // console.log('Waiting tx..', blockCounter);
+            }
           });
-        }
+        };
       }
     });
   </script>
