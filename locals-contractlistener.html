@@ -16,25 +16,25 @@ Simple example:
 
     <locals-contractlistener
       web3="{{web3}}" filter="{{filterobject}}"
-      on-filter-match="callback">
-    </locals-contractlistener>
-
+      on-filter-match="callback"></locals-contractlistener>
 listener with time limit:
-
-    <locals-contractlistener
+<locals-contractlistener
       web3="{{web3}}" filter="{{filterobject}}"
       on-filter-match="callback"
-      timeout="60">
-    </locals-contractlistener>
-
+      timeout="60"></locals-contractlistener>
 You need to provide a web3-wallet component to this component. See an example on how to do this in the demo.
 This component uses web3.js - so you will need access to an Ethereum node before you can start running queries.
 
 @demo demo/index.html
 -->
-
 <dom-module id="locals-contractlistener">
-  <script>
+<template>
+  <template is="dom-if" if="{{isv(state,'init')}}">Initial state</template>
+  <template is="dom-if" if="{{isv(state,'txstarted')}}">tx gestart</template>
+  <template is="dom-if" if="{{isv(state,'txhashreceived')}}">tx hash ontvangen</template>
+  <template is="dom-if" if="{{isv(state,'txmined')}}">tx gemined</template>
+</template>
+<script>
     Polymer({
       is: 'locals-contractlistener',
 
@@ -46,6 +46,10 @@ This component uses web3.js - so you will need access to an Ethereum node before
           type: Object,
           notify:true,
           observer: '_web3observer'
+        },
+        state: {
+          type: String,
+          value: 'init'
         },
         /**
         * The `filter` object can be either a string or an object.
@@ -68,6 +72,7 @@ This component uses web3.js - so you will need access to an Ethereum node before
         /**
         * the timeout attribute is optional. It defines a maximum TTL in seconds before the filter gets cleaned up
         * ommiting this parameter makes the listener listen forever.
+        * When a timeout occurs - this element fires a 'timeout' event
         */
         timeout: {
           type: Number,
@@ -87,6 +92,10 @@ This component uses web3.js - so you will need access to an Ethereum node before
         this.filterattached = false;
       },
 
+      isv: function(variable,value) {
+        return (variable == value);
+      },
+
       attached: function() {
         // `attached` fires once the element and its parents have been inserted
         // into a document.
@@ -94,7 +103,6 @@ This component uses web3.js - so you will need access to an Ethereum node before
         // This is a good place to perform any work related to your element's
         // visual state or active behavior (measuring sizes, beginning animations,
         // loading resources, etc).
-        
       },
 
       detached: function() {
@@ -109,6 +117,10 @@ This component uses web3.js - so you will need access to an Ethereum node before
           this.filterInstance.stopWatching();
           delete this.filterInstance;
         }
+        if (this.timoutInstance){
+          clearTimeout(this.timoutInstance);
+          delete this.timoutInstance;
+        }
       },
 
       _web3observer: function(){
@@ -120,9 +132,10 @@ This component uses web3.js - so you will need access to an Ethereum node before
       _timeoutobserver: function() {
         var self = this;
         if (this.timeout) {
-          setTimeout(function() {
+          this.timoutInstance = setTimeout(function() {
             self._destroyfilter();
             self.fire('timeout');
+            this.timoutInstance = null;
           }, this.timeout * 1000);
         }
       },
