@@ -65,15 +65,6 @@ This component uses web3.js - so you will need access to an Ethereum node before
           type: String,
           observer: '_txhashobserver'
         },
-        /**
-         * the timeout attribute is optional. It defines a maximum TTL in seconds before the filter gets cleaned up
-         * ommiting this parameter makes the listener listen forever.
-         * When a timeout occurs - this element fires a 'timeout' event
-         */
-        timeout: {
-          type: Number,
-          observer: '_timeoutobserver'
-        },
 
         _filterattached: {
           type: Boolean,
@@ -114,26 +105,11 @@ This component uses web3.js - so you will need access to an Ethereum node before
           this.filterInstance.stopWatching();
           delete this.filterInstance;
         }
-        if (this.timoutInstance) {
-          clearTimeout(this.timoutInstance);
-          delete this.timoutInstance;
-        }
       },
 
       _web3observer: function() {
         if (!this._filterattached) {
           this._txhashobserver();
-        }
-      },
-
-      _timeoutobserver: function() {
-        var self = this;
-        if (this.timeout) {
-          this.timoutInstance = setTimeout(function() {
-            self._destroyfilter();
-            self.fire('timeout');
-            this.timoutInstance = null;
-          }, this.timeout * 1000);
         }
       },
 
@@ -172,7 +148,7 @@ This component uses web3.js - so you will need access to an Ethereum node before
               self.state = 'txmined';
               // Tx hash not found yet?
             } else {
-              // console.log('Waiting tx..', blockCounter);
+              self.fire('waiting');
             }
           });
         };
