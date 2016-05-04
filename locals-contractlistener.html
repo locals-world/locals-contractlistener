@@ -71,7 +71,7 @@ This component uses web3.js - so you will need access to an Ethereum node before
 
   </style>
 
-  <h1>{{action}}</h1>
+  <h1><content></content></h1>
 
   <template is="dom-if" if="{{_isstate(state,'init')}}">
     <locals-loader small>Initialising</locals-loader>
@@ -120,11 +120,6 @@ This component uses web3.js - so you will need access to an Ethereum node before
         _filterattached: {
           type: Boolean,
           notify: true
-        },
-
-        action: {
-          type: String,
-          value: ''
         },
 
         succes: {
