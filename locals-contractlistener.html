@@ -13,18 +13,48 @@ LOCALS
 <link rel="import" href="../iron-flex-layout/iron-flex-layout.html">
 
 <!--
-An element listening to the state of transaction hashes
-Simple example:
+An element listening to the state of transaction hashes or activity on a contract address
+Simple example: listen to a certain TXhash
+Updates 'state' ('txstarted','txmined','txexired')
+
 
     <locals-contractlistener
       web3="{{web3}}"
-      txhash="{{transactionhash}}">
-    </locals-contractlistener>
-listener with time limit:
-<locals-contractlistener
+      txhash="{{transactionhash}}" state="{{state}}"></locals-contractlistener>
+
+Example: listen to a contract-address and get event details
+
+    <locals-contractlistener
       web3="{{web3}}"
-      txhash="{{transactionhash}}
-      timeout="60"></locals-contractlistener>
+      contractaddress="{{address}}" on-filter-match="contractEvent"></locals-contractlistener>
+
+contractEvent: function(e) e.detail will have the format:`
+
+```
+{
+  result: 
+  {
+    "address": "0xf37626aa99f29a4afe7406e386f68cc77be2cb6e",
+    "blockHash": "0x9daf95723b4cff6440673213d22eae95d12b19a89c3b051298d8c7adf7ab96f6",
+    "blockNumber": 909658,
+    "data": "0x000000000000000000000000000000000000000000000000ffdab0149e804000ffffffffffffffffffffffffffffffffffffffffffffffff1c0ed015351625f10000000000000000000000000000000000000000000000640000000000000000",
+    "logIndex": 0,
+    "topics": ["0x53fd41308e1172ecd43fd78ca7ba8b39bd0000bcc7cb3fb0af3b2ba7645d8f13", "0x000000000000000000000000ec805db17a7b76a47088e8ab4e18c4b531a67b89", "0x15852d4126acece333636cf37a9c241cf49d0458683995f99f4df2d002b4ab5e", "0x0000000000000000000000000000000000000000000000000000000000000001"],
+    "transactionHash": "0xec8b992fdf801a1245f99c3a77271211547446b827c79fac61832d3427d88e5b",
+    "transactionIndex": 0
+  }
+}
+````
+
+or in case of an error:
+
+```
+{
+  error: 'description of error'
+}
+```
+
+
 You need to provide a web3-wallet component to this component. See an example on how to do this in the demo.
 This component uses web3.js - so you will need access to an Ethereum node before you can start running queries.
 
@@ -33,7 +63,7 @@ This component uses web3.js - so you will need access to an Ethereum node before
 <dom-module id="locals-contractlistener">
 <template>
 
- <style>
+  <style>
       :host {
         display: block;
       }
@@ -71,24 +101,31 @@ This component uses web3.js - so you will need access to an Ethereum node before
 
   </style>
 
-  <h1><content></content></h1>
-
-  <template is="dom-if" if="{{_isstate(state,'init')}}">
-    <locals-loader small>Initialising</locals-loader>
-  </template>
-  <template is="dom-if" if="{{_isstate(state,'txstarted')}}">
-    <div class="msg"><p>Received transaction hash </p><locals-icon small icon="v" iconcolor="darkgrey"></locals-icon></div>
-    <locals-loader small>Mining transaction hash</locals-loader>
-  </template>
-  <template is="dom-if" if="{{_isstate(state,'txexpired')}}">
-    <p>tx expired !!!</p>
-<!--     <locals-loader small>tx expired</locals-loader> -->
+    <template is="dom-if" if="{{_isstate(state,'init')}}">
+      <locals-loader small>Initialising</locals-loader>
+    </template>
+    <template is="dom-if" if="{{_isstate(state,'txstarted')}}">
+      <div class="msg">
+        <p>Received transaction hash</p>
+        <locals-icon small icon="v" iconcolor="darkgrey"></locals-icon>
+      </div>
+      <locals-loader small>Mining transaction hash</locals-loader>
+    </template>
+    <template is="dom-if" if="{{_isstate(state,'txexpired')}}">
+      <p>tx expired !!!</p>
   </template>
   <template is="dom-if" if="{{_isstate(state,'txmined')}}">
-  <div class="msg"><p>Initialised, received transaction hash </p><locals-icon small icon="v" iconcolor="darkgrey"></locals-icon></div>
-  <div class="msg"><p>Transaction hash mined </p><locals-icon small icon="v" iconcolor="darkgrey"></locals-icon></div>
-  <h3>{{succes}}</h3>
+    <div class="msg">
+      <p>Initialised, received transaction hash</p>
+      <locals-icon small icon="v" iconcolor="darkgrey"></locals-icon>
+    </div>
+    <div class="msg">
+      <p>Transaction hash mined</p>
+      <locals-icon small icon="v" iconcolor="darkgrey"></locals-icon>
+    </div>
+    <h3>{{succes}}</h3>
   </template>
+
 </template>
 <script>
     Polymer({
@@ -106,8 +143,7 @@ This component uses web3.js - so you will need access to an Ethereum node before
          * the current state the component is in
          */
         state: {
-          type: String,
-          value: 'init'
+          type: String
         },
         /**
          * The transactionhash to listen to object can be either a string or an object.
@@ -115,6 +151,11 @@ This component uses web3.js - so you will need access to an Ethereum node before
         txhash: {
           type: String,
           observer: '_txhashobserver'
+        },
+
+        contractaddress: {
+          type: String,
+          observer: '_contractaddressobserver'
         },
 
         _filterattached: {
@@ -147,6 +188,7 @@ This component uses web3.js - so you will need access to an Ethereum node before
         // visual state or active behavior (measuring sizes, beginning animations,
         // loading resources, etc).
         this._txhashobserver();
+        this._contractaddressobserver();
       },
 
       detached: function() {
@@ -154,12 +196,21 @@ This component uses web3.js - so you will need access to an Ethereum node before
         // removed from a document.
         //
         // Use this to clean up anything you did in `attached`.
+        this._destroytxhashfilter();
+        this._destroycontractaddressfilter();
       },
 
-      _destroyfilter: function() {
+      _destroytxhashfilter: function() {
         if (this.filterInstance && !this.nowatch) {
           this.filterInstance.stopWatching();
           delete this.filterInstance;
+        }
+      },
+
+      _destroycontractaddressfilter: function() {
+        if (this.cafilter) {
+          this.cafilter.stopWatching();
+          delete this.cafilter;
         }
       },
 
@@ -167,12 +218,34 @@ This component uses web3.js - so you will need access to an Ethereum node before
         if (!this._filterattached) {
           this._txhashobserver();
         }
+        if (!this.cafilter){
+          this._contractaddressobserver();
+        }
+      },
+
+      _contractaddressobserver: function() {
+        var self = this;
+        if (!this.cafilter && this.web3 && this.contractaddress) {
+
+          if (this.cafilter) {
+            this.cafilter.stopWatching();
+          }
+          this.cafilter = this.web3.eth.filter({
+            bla: this.contractaddress
+          });
+          this.cafilter.watch(function(error, result) {
+            self.fire('filter-match', {
+              error: error,
+              result: result
+            });
+          });
+        }
       },
 
       _txhashobserver: function() {
         var self = this;
         if (this._filterattached) {
-          this._destroyfilter();
+          this._destroytxhashfilter();
         }
         if (!this._filterattached && this.web3 && this.txhash) {
           this.state = 'txstarted'

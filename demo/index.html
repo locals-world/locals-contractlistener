@@ -29,7 +29,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <div class="localscanvas">
       <div class="localstypo">
 
-        <h1>States</h1>
+        <h1>Transaction hash listener</h1>
         <h2>init</h2>
         <locals-contractlistener state="init" web3="{{web3}}"></locals-contractlistener>
         <h2>txstarted</h2>
@@ -39,7 +39,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <h2>txmined</h2>
         <locals-contractlistener state="txmined" web3="{{web3}}"></locals-contractlistener>
 
-
+        <h1>Contract event listener</h1>
+        <h2></h2>
+        <locals-contractlistener contractaddress="0xA7B92A7b501F532ac39CbA524891e303707e3f21" web3="{{web3}}" on-filter-match="contractEvent"></locals-contractlistener>
+        <template is="dom-repeat" items="{{contractevents}}">
+          <li>TXHash {{item.result.transactionHash}} at block {{item.result.blockNumber}}</li>
+        </template>
 
       </div>
     </div>
@@ -52,66 +57,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       'use strict';
       var app = document.querySelector('#app');
       app.host = "http://109.123.70.141:8545";
-
-      //listener button
-      app.dynamiclistener1eventsactive = false;
-      app.makeelement = function(){
-
-        // listener 1
-        app.dynamiclistener1events = [];
-        app.dynamiclistener1eventhandler = function(a){
-          app.push('dynamiclistener1events',a.detail);
-        };
-
-        // create new filter element
-        var myfilter = document.createElement('locals-contractlistener');
-        myfilter.web3 = this.$.web3wallet.web3;
-        myfilter.timeout = 15;
-        myfilter.addEventListener('filter-match',app.dynamiclistener1eventhandler);       
-
-        app.dynamiclistener1eventsactive = true;
-        myfilter.addEventListener('timeout',function(){
-          app.dynamiclistener1eventsactive = false;
-        });
-
+//      app.host = "http://localhost:8545";
+      
+      app.contractevents = [];
+      app.contractEvent = function(e){
+        app.push('contractevents',e.detail);
       }
-
-      // listener 1
-      app.events1 = [];
-      app.eventhandler1 = function(a,b){
-        app.push('events1',b);
-      };
-
-      app.events2 = [];
-      app.eventhandler2 = function(a, b) {
-        app.push('events2', b);
-      };
-
-      app.filter3 = {
-          fromBlock: 818934,
-          toBlock: 819034,
-          to: '0xe6469eda2d363d44062b97a68306cae1e82477aa'
-      };
-
-      app.filterobject = JSON.stringify(app.filter3);
-
-      app.events3 = [];
-      app.eventhandler3 = function(a,b){
-        app.push('events3',b);
-      };
-
-
-      app.events4 = [];
-      app.setcontractaddress = function(){
-        app.events4 = [];
-        app.filter4 = {
-          address: app.contractaddressinput
-        };
-      };
-
-      app.eventhandler4 = function(a,b){
-        app.push('events4',b);
-      };
 
     })(document);
 
