@@ -231,7 +231,8 @@ This component uses web3.js - so you will need access to an Ethereum node before
             this.cafilter.stopWatching();
           }
           this.cafilter = this.web3.eth.filter({
-            bla: this.contractaddress
+            fromBlock: 'latest',
+            to: this.contractaddress
           });
           this.cafilter.watch(function(error, result) {
             self.fire('filter-match', {
