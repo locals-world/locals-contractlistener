@@ -31,20 +31,29 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         <h1>Transaction hash listener</h1>
         <h2>init</h2>
-        <locals-contractlistener state="init" web3="{{web3}}"></locals-contractlistener>
+<!--         <locals-contractlistener state="init" web3="{{web3}}"></locals-contractlistener>
         <h2>txstarted</h2>
         <locals-contractlistener state="txstarted" web3="{{web3}}"></locals-contractlistener>
         <h2>txexpired</h2>
         <locals-contractlistener state="txexpired" web3="{{web3}}"></locals-contractlistener>
         <h2>txmined</h2>
         <locals-contractlistener state="txmined" web3="{{web3}}"></locals-contractlistener>
-
+ -->
         <h1>Contract event listener</h1>
         <h2></h2>
-        <locals-contractlistener contractaddress="0xA7B92A7b501F532ac39CbA524891e303707e3f21" web3="{{web3}}" on-filter-match="contractEvent"></locals-contractlistener>
+         <locals-contractlistener contractaddress="0xc135bd34a818ae09c783d125734177cbb1ea623c" web3="{{web3}}" on-filter-match="{{contractEvent}}"></locals-contractlistener>
         <template is="dom-repeat" items="{{contractevents}}">
           <li>TXHash {{item.result.transactionHash}} at block {{item.result.blockNumber}}</li>
         </template>
+
+        <h1>Random event listener</h1>
+        <h2></h2>
+        <locals-contractlistener customfilter='{"address":"0xc135bd34a818ae09c783d125734177cbb1ea623c","fromBlock":675949,"toBlock":678485}' web3="{{web3}}" on-filter-match="contractEvent2"></locals-contractlistener>
+        <template is="dom-repeat" items="{{contractevents2}}">
+          <li>TXHash {{item.result.transactionHash}} at block {{item.result.blockNumber}}</li>
+        </template>
+
+
 
       </div>
     </div>
@@ -57,12 +66,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       'use strict';
       var app = document.querySelector('#app');
       app.host = "http://109.123.70.141:8545";
-//      app.host = "http://localhost:8545";
       
       app.contractevents = [];
       app.contractEvent = function(e){
         app.push('contractevents',e.detail);
-      }
+      };
+
+      app.contractevents2 = [];
+      app.contractEvent2 = function(e){
+        app.push('contractevents2',e.detail);
+      };
 
     })(document);
 

@@ -15,12 +15,13 @@ LOCALS
 <!--
 An element listening to the state of transaction hashes or activity on a contract address
 Simple example: listen to a certain TXhash
-Updates 'state' ('txstarted','txmined','txexired')
+Updates 'state' ('txstarted','txmined','txexpired')
+and fires an event with the same name
 
 
     <locals-contractlistener
       web3="{{web3}}"
-      txhash="{{transactionhash}}" state="{{state}}"></locals-contractlistener>
+      txhash="{{transactionhash}}" state="{{state}}" on-txstarted="" on-txmined="" on-txexpired=""></locals-contractlistener>
 
 Example: listen to a contract-address and get event details
 
@@ -146,16 +147,27 @@ This component uses web3.js - so you will need access to an Ethereum node before
           type: String
         },
         /**
-         * The transactionhash to listen to object can be either a string or an object.
+         * The transactionhash to listen to
          **/
         txhash: {
           type: String,
           observer: '_txhashobserver'
         },
 
+        /**
+         * or the contractaddress to listen to
+         **/
         contractaddress: {
           type: String,
           observer: '_contractaddressobserver'
+        },
+
+        /**
+         * or the custom filter to listen to
+         **/
+        customfilter: {
+          type: Object,
+          observer: '_customfilterobserver'
         },
 
         _filterattached: {
@@ -187,8 +199,8 @@ This component uses web3.js - so you will need access to an Ethereum node before
         // This is a good place to perform any work related to your element's
         // visual state or active behavior (measuring sizes, beginning animations,
         // loading resources, etc).
-        this._txhashobserver();
-        this._contractaddressobserver();
+        // this._txhashobserver();
+        // this._contractaddressobserver();
       },
 
       detached: function() {
@@ -198,43 +210,67 @@ This component uses web3.js - so you will need access to an Ethereum node before
         // Use this to clean up anything you did in `attached`.
         this._destroytxhashfilter();
         this._destroycontractaddressfilter();
-      },
-
-      _destroytxhashfilter: function() {
-        if (this.filterInstance && !this.nowatch) {
-          this.filterInstance.stopWatching();
-          delete this.filterInstance;
-        }
+        this._destroycustomfilter();
       },
 
       _destroycontractaddressfilter: function() {
-        if (this.cafilter) {
-          this.cafilter.stopWatching();
-          delete this.cafilter;
+        if (this.contractaddressfilter) {
+          this.contractaddressfilter.stopWatching();
+          delete this.contractaddressfilter;
+        }
+      },
+
+      _destroytxhashfilter: function(){
+        if (this.txhashfilter) {
+          this.txhashfilter.stopWatching();
+          delete this.txhashfilter;
+        }
+      },
+
+      _destroycustomfilter: function(){
+        if (this.customfilterfilter) {
+          this.customfilterfilter.stopWatching();
+          delete this.customfilterfilter;
         }
       },
 
       _web3observer: function() {
-        if (!this._filterattached) {
+        if (!this.txhashfilter) {
           this._txhashobserver();
         }
-        if (!this.cafilter){
+        if (!this.contractaddressfilter){
           this._contractaddressobserver();
         }
+        if (!this.customfilterfilter){
+          this._customfilterobserver();
+        }
+      },
+
+      _customfilterobserver: function(){
+        var self = this;
+        if (!this.customfilterfilter && this.web3 && this.customfilter) {
+
+          if (this.customfilterfilter) {
+            this.customfilterfilter.stopWatching();
+          }
+          this.customfilterfilter = this.web3.eth.filter(this.customfilter);
+          this.customfilterfilter.watch(function(error, result) {
+            self.fire('filter-match', {
+              error: error,
+              result: result
+            });
+          });
+        }
+
       },
 
       _contractaddressobserver: function() {
         var self = this;
-        if (!this.cafilter && this.web3 && this.contractaddress) {
-
-          if (this.cafilter) {
-            this.cafilter.stopWatching();
-          }
-          this.cafilter = this.web3.eth.filter({
+        if (!this.contractaddressfilter && this.web3 && this.contractaddress) {
+          this.contractaddressfilter = this.web3.eth.filter({
             address: this.contractaddress
           });
-          this.cafilter.watch(function(error, result) {
-            console.log('filter-match on ', self.contractaddress);
+          this.contractaddressfilter.watch(function(error, result) {
             self.fire('filter-match', {
               error: error,
               result: result
@@ -245,13 +281,9 @@ This component uses web3.js - so you will need access to an Ethereum node before
 
       _txhashobserver: function() {
         var self = this;
-        if (this._filterattached) {
-          this._destroytxhashfilter();
-        }
-        if (!this._filterattached && this.web3 && this.txhash) {
-          this.state = 'txstarted'
-
-
+        if (!this.txhashfilter && this.web3 && this.txhash) {
+          this.state = 'txstarted';
+          this.fire('txstarted');
           /*
            * Watch for a particular transaction hash and call the awaiting function when done;
            * Ether-pudding uses another method, with web3.eth.getTransaction(...) and checking the txHash;
@@ -259,12 +291,16 @@ This component uses web3.js - so you will need access to an Ethereum node before
            */
           var blockCounter = 15;
           // Wait for tx to be finished
-          var filter = this.web3.eth.filter('latest').watch(function(err, blockHash) {
+          this.txhashfilter = this.web3.eth.filter('latest').watch(function(err, blockHash) {
             if (blockCounter <= 0) {
-              filter.stopWatching();
-              filter = null;
+              self._destroytxhashfilter();
 
-              self.state = 'expired';
+              // self.txhashfilter.stopWatching();
+              // self.txhashfilter = null;
+
+              self.state = 'txexpired';
+              self.fire('txexpired');
+
               return;
             }
             // Get info about latest Ethereum block
@@ -273,9 +309,11 @@ This component uses web3.js - so you will need access to an Ethereum node before
             // Found tx hash?
             if (block.transactions.indexOf(self.txhash) > -1) {
               // Tx is finished
-              filter.stopWatching();
-              filter = null;
+              self._destroytxhashfilter();              
+              // self.txhashfilter.stopWatching();
+              // self.txhashfilter = null;
               self.state = 'txmined';
+              self.fire('txmined');              
               // Tx hash not found yet?
             } else {
               self.fire('waiting');
