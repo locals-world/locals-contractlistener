@@ -29,6 +29,13 @@ Example: listen to a contract-address and get event details
       web3="{{web3}}"
       contractaddress="{{address}}" on-filter-match="contractEvent"></locals-contractlistener>
 
+Example: create a custom filter get event details
+
+    <locals-contractlistener
+    customfilter='{"address":"0xc135bd34a818ae09c783d125734177cbb1ea623c","fromBlock":675949,"toBlock":678485}'
+    web3="{{web3}}"
+    on-filter-match="contractEvent2"></locals-contractlistener>
+
 contractEvent: function(e) e.detail will have the format:`
 
 ```
